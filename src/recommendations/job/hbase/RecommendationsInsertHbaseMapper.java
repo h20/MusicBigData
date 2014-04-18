@@ -5,21 +5,20 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.client.Put;
-import org.apache.hadoop.hbase.mapreduce.TableReducer;
+import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Mapper;
 
-public class RecommendationInsertReducer extends TableReducer<Text, Text, Text>  {
-	
+public class RecommendationsInsertHbaseMapper extends Mapper<LongWritable, Text, ImmutableBytesWritable, Put> {
 	private byte[] rawUpdateColumnFamily = Bytes.toBytes("item_based");
-	
-	static Map<Integer, String> usersIdMap;
-	static Map<String, String> songsIdMap;
 	
 	public static Map<Integer, String> getIdMapFromFileUser(FileSystem fileSystem, Path path) throws IOException {
 		if (fileSystem.exists(path)) {
@@ -55,10 +54,14 @@ public class RecommendationInsertReducer extends TableReducer<Text, Text, Text> 
 		return null;
 	}
 	
-	@Override
-	public void reduce(Text keyin, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-	// aggregate counts
-		FileSystem fileSystem = FileSystem.get(context.getConfiguration());
+	static Map<Integer, String> usersIdMap;
+	static Map<String, String> songsIdMap;
+	
+	public void map(LongWritable key, Text val, Context context) throws IOException, InterruptedException {  
+		StringTokenizer tokenizer = new StringTokenizer(val.toString());
+	    String keyin = tokenizer.nextToken();
+	    String value = tokenizer.nextToken();
+	    FileSystem fileSystem = FileSystem.get(context.getConfiguration());
 		Path usersPath = new Path("/user/hduser/music_users_small");
 		Path songsPath = new Path("/user/hduser/music_songs_small");
 		
@@ -69,9 +72,7 @@ public class RecommendationInsertReducer extends TableReducer<Text, Text, Text> 
 		if (songsIdMap == null) {
 			songsIdMap = getIdMapFromFileSong(fileSystem, songsPath);
 		}
-	for (Text val : values) {
-	   // put date in table
-	   String value = val.toString();
+		
 	   value = value.substring(1, value.length() - 1);
 	   String [] itemRecos = value.split(",");
 	   String originalUserIdString = null;
@@ -92,9 +93,10 @@ public class RecommendationInsertReducer extends TableReducer<Text, Text, Text> 
 			   }
 		   }
 		   if (put.size() > 0) {
-			   context.write(keyin, put);
+			   ImmutableBytesWritable HKey = new ImmutableBytesWritable(Bytes.toBytes(originalUserIdString));
+			   context.write(HKey, put);
 		   }
 	   }
+	    
 	}
-  }
 }

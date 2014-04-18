@@ -157,7 +157,7 @@ public class HBaseTest {
     		HBaseTest.creatTable(tableName, familys);
     	}catch(Exception e){}
     }*/
-    public static void main(String[] agrs) {
+    public static void main1(String[] agrs) {
         try {
             String tablename = "scores";
             String[] familys = { "grade", "course" };
@@ -187,5 +187,27 @@ public class HBaseTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    public static void main(String args[]) throws Exception {
+    	/*String tableName = "recommendations";
+		String [] familys = {"item_based", "ALS", "input"};
+		HBaseTest.creatTable(tableName, familys);*/
+    	//MusicTable.createRecommendationTable();
+    	getOneRecord("recommendations", "fd50c4007b68a3737fe052d5a4f78ce8aa117f3d");
+    	/*HTable table = new HTable(conf, "movie_recommendations");
+    	Put put = new Put("fd50c4007b68a3737fe052d5a4f78ce8aa117f3d".getBytes());
+    	put.add("input".getBytes(), "SOAAADD12AB018A9DD".getBytes(), Bytes.toBytes("0"));
+    	table.put(put);
+    	table.close();*/
+    	//deleteTable("movie_recommendations");
+    	//getAllRecord("movie_recommendations");
+    	//String tableName = "movie_recommendations";
+		//String [] familys = {"item_based", "ALS", "input"};
+		//deleteTable(tableName);
+		//creatTable(tableName, familys);
+		/*HBaseAdmin admin = new HBaseAdmin(conf);
+		admin.addColumn(Bytes.toBytes(tableName), new HColumnDescriptor("input"));
+		admin.close();*/
     }
 }
