@@ -9,4 +9,16 @@ public class MusicTable {
     		HBaseTest.creatTable(tableName, familys);
     	}catch(Exception e){}
 	}
+	
+	public static void createSongSimilarityTable() {
+		String tableName = "song_similarity";
+		String [] familys = {"ratings_cosine", "metadata_cosine"};
+		try {
+			HBaseTest.creatTable(tableName, familys);
+		} catch (Exception e) {}
+	}
+	
+	public static void main(String args[]) throws Exception {
+		HBaseTest.getOneRecord("song_similarity", "SOVHZBK12AF72A66E8");
+	}
 }
