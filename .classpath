@@ -16,5 +16,14 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/guava-15.0.jar"/>
+	<classpathentry kind="lib" path="lib/hadoop-core-1.2.1.jar"/>
+	<classpathentry kind="lib" path="lib/hbase-0.94.0.jar"/>
+	<classpathentry kind="lib" path="lib/hdf-java-2.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/json-20140107.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.16.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.7.5.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-log4j12-1.5.8.jar"/>
+	<classpathentry kind="lib" path="lib/zookeeper-3.4.3.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
