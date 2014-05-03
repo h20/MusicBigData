@@ -35,8 +35,12 @@ public class TopArtistsJob extends Configured implements Tool {
         job.setMapperClass(TopArtistsMapper.class);
         job.setReducerClass(TopArtistsReducer.class);
         job.setSortComparatorClass(LongWritable.DecreasingComparator.class);
+        job.setNumReduceTasks(1);
         FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
+        if (args.length == 3 && args[2] != null) {
+            job.getConfiguration().set("topK", args[2]);
+        }
         return job.waitForCompletion(true) ? 0 : 1;
     }
 

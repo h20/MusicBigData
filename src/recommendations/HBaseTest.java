@@ -119,6 +119,21 @@ public class HBaseTest {
         }
         table.close();
     }
+    
+    public static void getOneRecord(String tableName, int rowKey) throws IOException{
+        HTable table = new HTable(conf, tableName);
+        Get get = new Get(Bytes.toBytes(rowKey));
+        Result rs = table.get(get);
+        for(KeyValue kv : rs.raw()){
+            System.out.print(Bytes.toInt(rs.getRow()) + " ");
+            System.out.print(Bytes.toString(kv.getFamily()) + ":" );
+            System.out.print(Bytes.toString(kv.getQualifier()) + " " );
+            System.out.print(kv.getTimestamp() + " " );
+            System.out.println(Bytes.toString(kv.getValue()));
+        }
+        table.close();
+    }
+    
     /**
      * Scan (or list) a table
      */

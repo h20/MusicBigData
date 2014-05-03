@@ -18,7 +18,7 @@ public class TopArtistsJobStarter {
         
         FilterArtistJob.main(filterInput);
         
-        String [] argsTopArtists = new String[2];
+        String [] argsTopArtists = new String[args.length - 1];
         
         //temp directory
         argsTopArtists[0] = args[1];
@@ -26,16 +26,21 @@ public class TopArtistsJobStarter {
         //final directory
         argsTopArtists[1] = args[2];
         
+        //max count
+        if (args.length == 4) {
+            argsTopArtists[2] = args[3];
+        }
+        
         TopArtistsJob.main(argsTopArtists);
         
-        Path tempPath = new Path(args[1]);
+        /*Path tempPath = new Path(args[1]);
         
         //Cleaning up the temp directory
         Configuration conf = new Configuration();
         FileSystem fileSystem = FileSystem.get(conf);
         if (fileSystem.exists(tempPath)) {
             fileSystem.delete(tempPath, true);
-        }
+        }*/
         long endTime = System.currentTimeMillis();
         System.out.println("Time: "+(endTime - startTime)/1000.0 + " seconds.");
     }

@@ -13,11 +13,20 @@ public class TopArtistsReducer extends
     
     protected void reduce(LongWritable key, Iterable<Text> values, 
             Context context) throws IOException, InterruptedException {
-        Counter counter = context.getCounter("artists", "top500");
+        Counter counter = null;
+        long maxCount = 0;
+        String topK = context.getConfiguration().get("topK");
+        if (topK != null) {
+            counter = context.getCounter("artists", "topK");
+            maxCount = Long.parseLong(topK);
+        }
         Iterator<Text> textIterator = values.iterator();
-        while(textIterator.hasNext() && counter.getValue() < 500) {
-            counter.increment(1);
+        while((counter == null || counter.getValue() < maxCount) 
+                && textIterator.hasNext()) {
             context.write(null, textIterator.next());
+            if (counter != null) {
+                counter.increment(1);
+            }
         }
     }
 

@@ -23,12 +23,16 @@ public class TopArtistsMapper extends
                 TSVArtistHelper.ARTIST_FAMILIARITY);
         String hottness = (String) songMap.get(
                 TSVArtistHelper.ARTIST_HOTTNESS);
-        if (familiarity != null && hottness != null) {
-            long popularity = (long) ((Double.parseDouble(familiarity) + 
-                    Double.parseDouble(hottness)) * 1000000);
-            artistData.set(songMap.toString());
-            popularityWritable.set(popularity);
-            context.write(popularityWritable, artistData);
+        if (familiarity != null && hottness != null && !familiarity.equals("nan")
+                && !hottness.equals("nan")) {
+            try {
+                long popularity = (long) ((Double.parseDouble(familiarity) + 
+                        Double.parseDouble(hottness)) * 1000000);
+                artistData.set(songMap.toString());
+                popularityWritable.set(popularity);
+                context.write(popularityWritable, artistData);
+            } catch(Exception e) {
+            }
         }
     }
 
