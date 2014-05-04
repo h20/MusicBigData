@@ -1,0 +1,17 @@
+Cluster size: 5(Task + Data)[large], 5(Task)[large], 1(Master)[large]
+JAR location: s3n://emr.mapreduce.programs/jars/MusicBigData.jar
+Main class: None
+Arguments: recommendations.job.input.InputCreator s3://music.recommendations.input/train_triplets.txt s3://music.recommendations.output/reco_index_input_large s3://music.recommendations.input/users_large.txt s3://music.recommendations.input/songs_large.txt
+Total time taken: 4 MINS
+Data size: 3 GB
+Configure Hadoop    s3://elasticmapreduce/bootstrap-actions/configure-hadoop    -s mapred.tasktracker.map.tasks.maximum=2 -m mapred.child.java.opts=-Xmx1536m
+
+Unique Users task: 2 min 57 secs
+Unique Songs task: 2 min 57 secs
+
+Cluster size: 5(Task + Data)[large], 5(Task)[large], 1(Master)[large]
+JAR location: s3n://emr.mapreduce.programs/jars/mahout-core-0.9-job.jar
+Main class: None
+Arguments: org.apache.mahout.cf.taste.hadoop.item.RecommenderJob -Dmapred.input.dir=s3://music.recommendations.output/reco_index_input_large -Dmapred.output.dir=s3://music.recommendations.output/reco_item_based --similarityClassname org.apache.mahout.math.hadoop.similarity.cooccurrence.measures.CosineSimilarity --numRecommendations 20
+Total time taken: 
+Data size: 3 GB (divided by 4 because of indexes)

@@ -1,12 +1,16 @@
-package recommendations;
+package hbase;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import msd.data.TSVArtistHelper;
@@ -16,8 +20,10 @@ import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.client.Get;
+import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
@@ -31,7 +37,7 @@ public class MusicTable {
 		try {
     		String tableName = "recommendations";
     		String [] familys = {"item_based", "ALS", "input"};
-    		HBaseTest.creatTable(tableName, familys);
+    		HBaseHelper.creatTable(tableName, familys);
     	}catch(Exception e){}
 	}
 	
@@ -39,7 +45,7 @@ public class MusicTable {
 		String tableName = "song_similarity";
 		String [] familys = {"ratings_cosine", "metadata_cosine"};
 		try {
-			HBaseTest.creatTable(tableName, familys);
+			HBaseHelper.creatTable(tableName, familys);
 		} catch (Exception e) {}
 	}
 	
@@ -47,7 +53,7 @@ public class MusicTable {
 	    String tableName = "top_songs";
 	    String [] familys = {"most_listened", "most_hot", "most_energy"};
 	    try {
-            HBaseTest.creatTable(tableName, familys);
+            HBaseHelper.creatTable(tableName, familys);
         } catch (Exception e) {}
 	}
 	
@@ -55,7 +61,7 @@ public class MusicTable {
         String tableName = "top_artists";
         String [] familys = {"most_popular"};
         try {
-            HBaseTest.creatTable(tableName, familys);
+            HBaseHelper.creatTable(tableName, familys);
         } catch (Exception e) {}
     }
 	
@@ -63,11 +69,40 @@ public class MusicTable {
         String tableName = "artists";
         String [] familys = {"data"};
         try {
-            HBaseTest.creatTable(tableName, familys);
+            HBaseHelper.creatTable(tableName, familys);
         } catch (Exception e) {}
     }
 	
-	public static void writeDataForMostListenedSongs(String filePath) 
+	public static void writeDataForTopSongsNonDFS(
+	        String filePath, String family) 
+            throws Exception {
+        Configuration hbaseConf = HBaseConfiguration.create();
+        BufferedReader bufferedReader = new BufferedReader(
+                new FileReader(filePath));
+        String line = "";
+        HTable table = new HTable(hbaseConf, "top_songs");
+        int rank = 1;
+        List<Put> putList = new ArrayList<Put>();
+        while ((line = bufferedReader.readLine()) != null) {
+            Put put = new Put(Bytes.toBytes(rank));
+            StringTokenizer tokenizer = new StringTokenizer(line);
+            String songId = tokenizer.nextToken();
+            String count = tokenizer.nextToken();
+            if (family.equals("most_hot")) {
+                count = String.valueOf(Integer.parseInt(count)/10000.0 - 0.3);
+            }
+            put.add(Bytes.toBytes(family), 
+                    Bytes.toBytes(songId), Bytes.toBytes(count));
+            putList.add(put);
+            rank++;
+        }
+        bufferedReader.close();
+        table.put(putList);
+        table.close();
+    }
+	
+	public static void writeDataForTopSongsDFS(
+	            String filePath, String family) 
 	        throws Exception {
 	    Configuration conf = new Configuration();
 	    Configuration hbaseConf = HBaseConfiguration.create();
@@ -85,7 +120,7 @@ public class MusicTable {
             StringTokenizer tokenizer = new StringTokenizer(line);
             String songId = tokenizer.nextToken();
             String count = tokenizer.nextToken();
-            put.add(Bytes.toBytes("most_listened"), 
+            put.add(Bytes.toBytes(family), 
                     Bytes.toBytes(songId), Bytes.toBytes(count));
             putList.add(put);
             rank++;
@@ -250,6 +285,40 @@ public class MusicTable {
 	    }
 	}
 	
+	private static void createTags(String path) throws IOException {
+	    BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
+	    FileWriter writer = new FileWriter(path+"_output");
+	    String line = "";
+	    Map<String, Integer> tagMap = new HashMap<String, Integer>();
+	    int max = 0;
+	    int tagCount = 200;
+	    while ((line = bufferedReader.readLine()) != null &&
+	            tagCount > 0) {
+	        String[] split = line.split("\t");
+	        String tag = split[0];
+	        int count = Integer.parseInt(split[1]);
+	        if (max == 0) {
+	            max = count;
+	        }
+	        count = (int) ((count/(max*1.0)) * 30);
+	        tagMap.put("\""+tag+"\"", count);
+	        tagCount--;
+	    }
+	    for (Map.Entry<String, Integer> entry : tagMap.entrySet()) {
+	        for (int i = 0; i < entry.getValue(); ++i) {
+	            writer.append(entry.getKey());
+	            writer.append('\n');
+	        }
+	    }
+	    writer.flush();
+	    bufferedReader.close();
+	    writer.close();
+	}
+	
 	public static void main(String args[]) throws Exception {
+	    /*writeDataForTopSongsNonDFS("/home/jeet/Documents/RTBDA/Project/data/AWS_Top_Songs/part-r-00000", 
+	            "most_hot");*/
+	    HBaseHelper.getOneRecord("top_songs", 1);
+	    //createTags("/home/jeet/Documents/RTBDA/Project/data/AWS_Tags_Count/part-r-00000");
 	}
 }

@@ -1,4 +1,4 @@
-package recommendations;
+package hbase;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.Text;
  
-public class HBaseTest {
+public class HBaseHelper {
  
     private static Configuration conf = null;
     /**
@@ -188,17 +188,17 @@ public class HBaseTest {
             HBaseTest.addRecord(tablename, "baoniu", "course", "math", "89");*/
  
             System.out.println("===========get one record========");
-            HBaseTest.getOneRecord(tablename, "zkb");
+            HBaseHelper.getOneRecord(tablename, "zkb");
  
             System.out.println("===========show all record========");
-            HBaseTest.getAllRecord(tablename);
+            HBaseHelper.getAllRecord(tablename);
  
             System.out.println("===========del one record========");
             /*HBaseTest.delRecord(tablename, "baoniu");*/
-            HBaseTest.getAllRecord(tablename);
+            HBaseHelper.getAllRecord(tablename);
  
             System.out.println("===========show all record========");
-            HBaseTest.getAllRecord(tablename);
+            HBaseHelper.getAllRecord(tablename);
         } catch (Exception e) {
             e.printStackTrace();
         }

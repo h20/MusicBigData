@@ -15,5 +15,5 @@ public class RecommendationInsertMapper extends Mapper<LongWritable, Text, Text,
 	    Text userId = new Text(tokenizer.nextToken());
 	    Text recommendations = new Text(tokenizer.nextToken());
         context.write(userId, recommendations);
-    }
+    } 
 }

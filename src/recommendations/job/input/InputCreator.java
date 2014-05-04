@@ -12,10 +12,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -32,9 +34,12 @@ public class InputCreator {
 	
 	public static void main(String args[]) throws Exception, ClassNotFoundException, InterruptedException {
 		Configuration conf = new Configuration();
+		conf.set("mapred.textoutputformat.separator", "");
 		//System.out.println("before: " + conf.get("mapred.child.java.opts"));
-		conf.set("mapred.child.java.opts", "-Xmx1024m");
+		//conf.set("mapred.child.java.opts", "-Xmx1024m");
 		//System.out.println("after: " + conf.get("mapred.child.java.opts"));
+        DistributedCache.addCacheFile(new URI(args[2]), conf);
+        DistributedCache.addCacheFile(new URI(args[3]), conf);
 		Job job = new Job(conf, "Input Cleaner for Recommendation");
 	    job.setJarByClass(InputCreator.class);
 	    FileInputFormat.addInputPath(job, new Path(args[0]));

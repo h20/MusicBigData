@@ -1,0 +1,20 @@
+Cluster size: 3(Task + Data), 3(Task), 1(Master)
+JAR location: s3n://emr.mapreduce.programs/jars/MusicBigData.jar
+Main class: None
+Arguments: msd.job.artist.TopArtistsJobStarter s3://tbmmsd/*.tsv.* s3://music.artist.temp/temp_artists_all s3://music.artist.output/top_artists_all
+Total time taken: 4 minutes
+Data size: 8 GB
+
+Cluster size: 5(Task + Data), 5(Task), 1(Master)
+JAR location: s3n://emr.mapreduce.programs/jars/MusicBigData.jar
+Main class: None
+Arguments: msd.job.artist.TopArtistsJobStarter s3://tbmmsd/*.tsv.* s3://music.artist.temp/temp_artists_all s3://music.artist.output/top_artists_all
+Total time taken: 34 minutes
+Data size: 280 GB
+
+s3n://emr.mapreduce.programs/jars/MusicBigData.jar 
+msd.job.song.TopSongsByDanceabilityJob s3://tbmmsd/*.tsv.* s3://music.songs.output/top_hot_songs_1000 1000
+
+recommendations.job.input.InputCreator s3://music.recommendations.input/kaggle_visible_evaluation_triplets.txt s3://music.recommendations.output/reco_index_input_small s3://music.recommendations.input/kaggle_users.txt s3://music.recommendations.input/kaggle_songs.txt
+
+Unique users task: 

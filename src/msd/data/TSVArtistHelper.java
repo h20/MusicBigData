@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.hadoop.io.FloatWritable;
 import org.json.JSONObject;
 
 public class TSVArtistHelper {
@@ -64,6 +65,8 @@ public class TSVArtistHelper {
         //map.put(ARTIST_TERMS_FREQ, metadataSplit[15]);
         //map.put(ARTIST_TERMS_WEIGHT, metadataSplit[16]);
         map.put(SIMILAR_ARTISTS, removeLastComma(metadataSplit[42]));
+        map.put("dance", metadataSplit[43]);
+        
         return map;
     }
     
@@ -93,8 +96,10 @@ public class TSVArtistHelper {
     }
     
     public static void main(String args[]) throws IOException {
-        File file = new File("/home/jeet/Documents/RTBDA/Project/data/A.tsv.a");
+       File file = new File("/home/jeet/Documents/RTBDA/Project/data/A.tsv.a");
         BufferedReader reader = new BufferedReader(new FileReader(file));
+        System.out.println(parseLine(reader.readLine()).get("dance"));
+        System.out.println(parseLine(reader.readLine()).get("dance"));
         reader.close();
     }
 
