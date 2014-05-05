@@ -13,5 +13,5 @@ Cluster size: 5(Task + Data)[large], 5(Task)[large], 1(Master)[large]
 JAR location: s3n://emr.mapreduce.programs/jars/mahout-core-0.9-job.jar
 Main class: None
 Arguments: org.apache.mahout.cf.taste.hadoop.item.RecommenderJob -Dmapred.input.dir=s3://music.recommendations.output/reco_index_input_large -Dmapred.output.dir=s3://music.recommendations.output/reco_item_based --similarityClassname org.apache.mahout.math.hadoop.similarity.cooccurrence.measures.CosineSimilarity --numRecommendations 20
-Total time taken: 
+Total time taken: 39 mins
 Data size: 3 GB (divided by 4 because of indexes)

@@ -111,11 +111,11 @@ public class HBaseHelper {
         Get get = new Get(rowKey.getBytes());
         Result rs = table.get(get);
         for(KeyValue kv : rs.raw()){
-            System.out.print(new String(kv.getRow()) + " " );
-            System.out.print(new String(kv.getFamily()) + ":" );
-            System.out.print(new String(kv.getQualifier()) + " " );
+            System.out.print(Bytes.toString(kv.getRow()) + " " );
+            System.out.print(Bytes.toString(kv.getFamily()) + ":" );
+            System.out.print(Bytes.toString(kv.getQualifier()) + " " );
             System.out.print(kv.getTimestamp() + " " );
-            System.out.println(new String(kv.getValue()));
+            System.out.println(Bytes.toString(kv.getValue()));
         }
         table.close();
     }
@@ -209,8 +209,14 @@ public class HBaseHelper {
 		String [] familys = {"item_based", "ALS", "input"};
 		HBaseTest.creatTable(tableName, familys);*/
     	//MusicTable.createRecommendationTable();
-    	getOneRecord("recommendations", "fd50c4007b68a3737fe052d5a4f78ce8aa117f3d");
-    	/*HTable table = new HTable(conf, "movie_recommendations");
+        //getAllRecord("song_similarity_large");
+        getOneRecord("song_similarity_large", "SOAXQEG12AB01899F9");
+        getOneRecord("song_similarity_large", "SOCFZJL131634A7670");
+        /*getOneRecord("song_similarity_large", "SONINLH12AB018A9E4");*/
+    	//getOneRecord("recommendations_large", "d6589314c0a9bcbca4fee0c93b14bc402363afea");
+    	//getOneRecord("recommendations", Bytes.toBytes("fd50c4007b68a3737fe052d5a4f78ce8aa117f3d"));
+        //getAllRecord("recommendations_large");
+        /*HTable table = new HTable(conf, "movie_recommendations");
     	Put put = new Put("fd50c4007b68a3737fe052d5a4f78ce8aa117f3d".getBytes());
     	put.add("input".getBytes(), "SOAAADD12AB018A9DD".getBytes(), Bytes.toBytes("0"));
     	table.put(put);

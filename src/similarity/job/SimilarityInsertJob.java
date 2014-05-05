@@ -12,9 +12,13 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 
 public class SimilarityInsertJob {
+    /*
+     * Time taken: 4mins, 50sec
+     */
 	public static void main(String args[]) throws IOException, ClassNotFoundException, InterruptedException {
 		//Configuration hadoopConf = new Configuration();
-		Configuration conf = HBaseConfiguration.create();
+	    Configuration conf = HBaseConfiguration.create();
+        conf.set("mapred.child.java.opts", "-Xmx1536m");
 		Job job = new Job(conf, "Similarity output HBase insertion job");
 		job.getConfiguration().set("familyBytes", args[2]);
 		FileInputFormat.addInputPath(job, new Path(args[0]));

@@ -35,14 +35,14 @@ public class MusicTable {
 	
 	public static void createRecommendationTable() {
 		try {
-    		String tableName = "recommendations";
+    		String tableName = "recommendations_large";
     		String [] familys = {"item_based", "ALS", "input"};
     		HBaseHelper.creatTable(tableName, familys);
     	}catch(Exception e){}
 	}
 	
 	public static void createSongSimilarityTable() {
-		String tableName = "song_similarity";
+		String tableName = "song_similarity_large";
 		String [] familys = {"ratings_cosine", "metadata_cosine"};
 		try {
 			HBaseHelper.creatTable(tableName, familys);
@@ -301,7 +301,7 @@ public class MusicTable {
 	            max = count;
 	        }
 	        count = (int) ((count/(max*1.0)) * 30);
-	        tagMap.put("\""+tag+"\"", count);
+	        tagMap.put(tag, count);
 	        tagCount--;
 	    }
 	    for (Map.Entry<String, Integer> entry : tagMap.entrySet()) {
@@ -318,7 +318,8 @@ public class MusicTable {
 	public static void main(String args[]) throws Exception {
 	    /*writeDataForTopSongsNonDFS("/home/jeet/Documents/RTBDA/Project/data/AWS_Top_Songs/part-r-00000", 
 	            "most_hot");*/
-	    HBaseHelper.getOneRecord("top_songs", 1);
+	    //HBaseHelper.getOneRecord("top_songs", 1);
 	    //createTags("/home/jeet/Documents/RTBDA/Project/data/AWS_Tags_Count/part-r-00000");
+	    createSongSimilarityTable();
 	}
 }

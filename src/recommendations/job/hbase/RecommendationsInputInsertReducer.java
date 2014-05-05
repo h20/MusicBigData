@@ -18,12 +18,6 @@ public class RecommendationsInputInsertReducer extends TableReducer<Text, Text, 
 			String itemRating[] = value.toString().split("::");
 			put.add(familyBytes, Bytes.toBytes(itemRating[0]), Bytes.toBytes(itemRating[1]));
 		}
-		if (keyin.toString().equals("fd50c4007b68a3737fe052d5a4f78ce8aa117f3d")) {
-			String userId = "fd50c4007b68a3737fe052d5a4f78ce8aa117f3d";
-			put.add(familyBytes, Bytes.toBytes("SOAAADD12AB018A9DD"), Bytes.toBytes("0"));
-			context.write(new Text(userId), put);
-		} else {
-			context.write(keyin, put);
-		}
+		context.write(keyin, put);
 	}
 }

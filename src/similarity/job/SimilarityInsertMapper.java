@@ -23,6 +23,9 @@ public class SimilarityInsertMapper extends Mapper<LongWritable, Text, Text, Tex
 	    	song1Text.set(song1);
 	    	song2AndSimilarity.set(song2+"::"+similarity);
 	    	context.write(song1Text, song2AndSimilarity);
+	    	song1Text.set(song2);
+            song2AndSimilarity.set(song1+"::"+similarity);
+            context.write(song1Text, song2AndSimilarity);
 	    }
     }
 

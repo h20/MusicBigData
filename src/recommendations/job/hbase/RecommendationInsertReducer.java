@@ -29,7 +29,7 @@ public class RecommendationInsertReducer extends TableReducer<Text, Text, Text> 
 			String line;
 			int id = 0;
 			while((line = br.readLine()) != null) {
-				map.put(id++, line);
+				map.put(id++, line.trim());
 			}
 			br.close();
 			in.close();
@@ -44,10 +44,10 @@ public class RecommendationInsertReducer extends TableReducer<Text, Text, Text> 
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			Map<String, String> map = new HashMap<String, String>();
 			String line;
-			while((line = br.readLine()) != null) {
-				String[] values = line.split(" ", -1);
-				map.put(values[1], values[0]);
-			}
+			int id = 0;
+            while((line = br.readLine()) != null) {
+                map.put(String.valueOf(id++), line.trim());
+            }
 			br.close();
 			in.close();
 			return map;
@@ -59,8 +59,8 @@ public class RecommendationInsertReducer extends TableReducer<Text, Text, Text> 
 	public void reduce(Text keyin, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 	// aggregate counts
 		FileSystem fileSystem = FileSystem.get(context.getConfiguration());
-		Path usersPath = new Path("/user/hduser/music_users_small");
-		Path songsPath = new Path("/user/hduser/music_songs_small");
+		Path usersPath = new Path("/user/hduser/reco_users_large/part-r-00000");
+		Path songsPath = new Path("/user/hduser/reco_songs_large/part-r-00000");
 		
 		if (usersIdMap == null) {
 			usersIdMap = getIdMapFromFileUser(fileSystem, usersPath);
@@ -78,7 +78,7 @@ public class RecommendationInsertReducer extends TableReducer<Text, Text, Text> 
 	   try {
 		   originalUserIdString = usersIdMap.get(Integer.parseInt(keyin.toString()));
 	   } catch(Exception e) {
-		   
+		   System.out.println(keyin.toString());
 	   }
 	   if (originalUserIdString != null) {
 		   Put put = new Put(originalUserIdString.getBytes());

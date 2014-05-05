@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -13,10 +14,15 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 /*
  * hadoop jar /home/jeet/Documents/RTBDA/reco/reco.jar recommendations.job.hbase.RecommendationInsertJob output_sample.txt
  */
+/*
+ * Large time taken: 3 min 32 seconds
+ */
 public class RecommendationInsertJob {
 	public static void main(String args[]) throws IOException, ClassNotFoundException, InterruptedException {
-		Configuration conf = new Configuration();
-		Job job = new Job(conf, "Recommendations: HBase insertion job");
+		//Configuration conf = new Configuration();
+	    Configuration conf = HBaseConfiguration.create();
+	    conf.set("mapred.child.java.opts", "-Xmx1536m");
+	    Job job = new Job(conf, "Recommendations: HBase insertion job");
 		FileInputFormat.addInputPath(job, new Path(args[0]));
 		job.setJarByClass(RecommendationInsertJob.class);
 		job.setInputFormatClass(TextInputFormat.class);
@@ -24,6 +30,7 @@ public class RecommendationInsertJob {
 		job.setMapOutputKeyClass(Text.class);
 		job.setMapOutputValueClass(Text.class);
 		TableMapReduceUtil.initTableReducerJob(args[1], RecommendationInsertReducer.class, job);
+		job.setNumReduceTasks(2);
 		job.waitForCompletion(true);
 		/*Configuration conf = new Configuration();
 		Job job = new Job(conf, "Recommendations: HBase insertion job");

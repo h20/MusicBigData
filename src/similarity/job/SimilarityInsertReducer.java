@@ -3,8 +3,13 @@ package similarity.job;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -15,7 +20,6 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.Text;
 
 public class SimilarityInsertReducer extends TableReducer<Text, Text, Text> {
-	
 	
 	static byte[] familyBytes = null;
 	/*@Override
@@ -39,10 +43,10 @@ public class SimilarityInsertReducer extends TableReducer<Text, Text, Text> {
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			Map<String, String> map = new HashMap<String, String>();
 			String line;
-			while((line = br.readLine()) != null) {
-				String[] values = line.split(" ", -1);
-				map.put(values[1], values[0]);
-			}
+			int id = 0;
+            while((line = br.readLine()) != null) {
+                map.put(String.valueOf(id++), line.trim());
+            }
 			br.close();
 			in.close();
 			return map;
@@ -54,7 +58,7 @@ public class SimilarityInsertReducer extends TableReducer<Text, Text, Text> {
 	public void reduce(Text keyin, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 	// aggregate counts
 		FileSystem fileSystem = FileSystem.get(context.getConfiguration());
-		Path songsPath = new Path("/user/hduser/music_songs_small");
+		Path songsPath = new Path("/user/hduser/reco_songs_large/part-r-00000");
 		
 		if (songsIdMap == null) {
 			songsIdMap = getIdMapFromFileSong(fileSystem, songsPath);
@@ -63,9 +67,30 @@ public class SimilarityInsertReducer extends TableReducer<Text, Text, Text> {
 			familyBytes = Bytes.toBytes(context.getConfiguration().get("familyBytes"));
 		}
 		Put put = new Put(Bytes.toBytes(songsIdMap.get(keyin.toString())));
-		for (Text value : values) {
-			String itemSimilarity[] = value.toString().split("::");
-			put.add(familyBytes, Bytes.toBytes(songsIdMap.get(itemSimilarity[0])), Bytes.toBytes(itemSimilarity[1]));
+		TreeMap<Double, List<String>> topSimilar = 
+		        new TreeMap<Double, List<String>>(Collections.reverseOrder());
+        for (Text value : values) {
+            String itemSimilarity[] = value.toString().split("::");
+            double similarity = Double.parseDouble(itemSimilarity[1]);
+            List<String> songs = topSimilar.get(similarity);
+            if (songs == null) {
+                songs = new ArrayList<String>();
+                topSimilar.put(similarity, songs);
+            }
+            songs.add(itemSimilarity[0]);
+        }
+        
+        Iterator<Map.Entry<Double, List<String>>> mapIter = 
+                topSimilar.entrySet().iterator();
+        int maxCount = 15;
+		while(mapIter.hasNext() && maxCount > 0) {
+		    Map.Entry<Double, List<String>> entry = mapIter.next();
+		    double key = entry.getKey();
+		    List<String> list = entry.getValue();
+		    for (int i = 0; i < list.size() && maxCount > 0; i++) {
+		        put.add(familyBytes, Bytes.toBytes(songsIdMap.get(list.get(i))), Bytes.toBytes(String.valueOf(key)));
+	            maxCount--;
+		    }
 		}
 		context.write(keyin, put);
 	}
