@@ -2,5 +2,5 @@ Cluster size: 6large(Task + Data), 6large(Task), 1(Master)
 JAR location: s3n://emr.mapreduce.programs/jars/MusicBigData.jar
 Main class: None
 Arguments: msd.job.tags.SongsCountByYearJob s3://tbmmsd/*.tsv.* s3://music.tags.output/year_tags_count
-Total time taken: 
+Total time taken: 16 mins
 Data size: 280 GB
